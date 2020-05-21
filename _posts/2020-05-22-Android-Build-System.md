@@ -1,6 +1,6 @@
 ---
 layout: post
-title: AOSP Build System
+title: AOSP Build System (Part 1)
 subtitle: An introduction and explaining to Android Open Source Project build system
 gh-repo: HungEmb/Linux-device-driver
 gh-badge: [star, fork, follow]
