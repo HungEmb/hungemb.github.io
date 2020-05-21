@@ -7,3 +7,4 @@ gh-badge: [star, fork, follow]
 tags: [AOSP, Build System]
 comments: true
 ---
+Before getting your dirty hands in to AOSP, The part you have to persive firtly is build system
