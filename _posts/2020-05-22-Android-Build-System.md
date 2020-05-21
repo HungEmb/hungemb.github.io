@@ -7,4 +7,4 @@ gh-badge: [star, fork, follow]
 tags: [AOSP, Build System]
 comments: true
 ---
-Before getting your dirty hands in to AOSP, The part you have to persive firtly is build system
+Before getting your dirty hands into developing Android system, The part of knowledge you have to perceive firtly is build system. I will have an overview of build system itself, tool involved, and the unique approach to the whole process Google has.
