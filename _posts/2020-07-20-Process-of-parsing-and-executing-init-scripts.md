@@ -33,7 +33,7 @@ Look at the code of init process to have a more detail about the locations that 
     am.QueueEventTrigger("early-init");
 ...
 ~~~
-The definition of LoadBootScripts() function: 
+- The definition of LoadBootScripts() function: 
 ~~~
 static void LoadBootScripts(ActionManager& action_manager, ServiceList& service_list) {
     Parser parser = CreateParser(action_manager, service_list);
@@ -59,8 +59,10 @@ static void LoadBootScripts(ActionManager& action_manager, ServiceList& service_
 }
 ~~~
 As you can see, It firstly checks whether the ```ro.boot.init_rc``` has a value or not. if ```ro.boot.init_rc``` has a value, it will parse script file with file name is ```ro.boot.init_rc```'s value. if not, the location parsed is default file and directory such as ```/init.rc```, ```/system/etc/init```, ```/product/etc/init```, ```/odm/etc/init```, ```/vendor/etc/init```.
-![Crepe](https://hungemb.github.io/images/1a.jpg)
-
+- Diagram below here show process of parsing script file folder generally:
+![Crepe](https://hungemb.github.io/images/1.png)
+- And a bit more detail :
+![Crepe](https://hungemb.github.io/images/2.png)
 
 
 
