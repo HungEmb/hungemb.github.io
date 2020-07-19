@@ -17,20 +17,7 @@ Look at the code of init process to have a more detail about the locations that 
 - init.cpp :
 ~~~
 ...
-    Action::set_function_map(&function_map);
-
-    subcontexts = InitializeSubcontexts();
-
-    ActionManager& am = ActionManager::GetInstance();
-    ServiceList& sm = ServiceList::GetInstance();
-
     LoadBootScripts(am, sm);
-
-    // Turning this on and letting the INFO logging be discarded adds 0.2s to
-    // Nexus 9 boot time, so it's disabled by default.
-    if (false) DumpState();
-
-    am.QueueEventTrigger("early-init");
 ...
 ~~~
 - The definition of LoadBootScripts() function: 
@@ -59,9 +46,9 @@ static void LoadBootScripts(ActionManager& action_manager, ServiceList& service_
 }
 ~~~
 As you can see, It firstly checks whether the ```ro.boot.init_rc``` has a value or not. if ```ro.boot.init_rc``` has a value, it will parse script file with file name is ```ro.boot.init_rc```'s value. if not, the location parsed is default file and directory such as ```/init.rc```, ```/system/etc/init```, ```/product/etc/init```, ```/odm/etc/init```, ```/vendor/etc/init```.
-- Diagram below here show process of parsing script file folder generally:
+- Diagram below here show process of parsing script file and folder generally:
 ![Crepe](https://hungemb.github.io/images/1.png)
-- And a bit more detail :
+- More detail about ParseData() function:
 ![Crepe](https://hungemb.github.io/images/2.png)
 
 
