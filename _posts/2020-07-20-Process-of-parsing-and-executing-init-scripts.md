@@ -59,7 +59,7 @@ static void LoadBootScripts(ActionManager& action_manager, ServiceList& service_
 }
 ~~~
 As you can see, It firstly checks whether the ```ro.boot.init_rc``` has a value or not. if ```ro.boot.init_rc``` has a value, it will parse script file with file name is ```ro.boot.init_rc```'s value. if not, the location parsed is default file and directory such as ```/init.rc```, ```/system/etc/init```, ```/product/etc/init```, ```/odm/etc/init```, ```/vendor/etc/init```.
-![Crepe](https://drive.google.com/file/d/1HUkStcfgq8whfwjEdDa4vrU5i-GXaaDd/view?usp=sharing)
+![Crepe](https://hungemb.github.io/images/1a.jpg)
 
 
 
