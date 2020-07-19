@@ -13,3 +13,51 @@ Today, I will illustrate how init intergrates with the rest of Android component
 Major behavior of init process is through its script files. Let's go, I will show you about location, sematics, process of parsing and executing init script files.
 ### Location
 The main location of everything belonging to init process is the root directory (/). Here you can find actual init binary itself and scipt files that control the main behavior of init process, such as: init.rc, init.environ.rc, init.zygote32.rc,... . In addition, There is a few other locations comprising script files such as ```/system/etc/init```, ```/product/etc/init```, ```/odm/etc/init```, ```/vendor/etc/init```. These directory comprises script file that initializing HIDL service at HAL Layer.
+Look at the code of init process to have a more detail about the locations that init process finds sctipt files. In ```init.cpp```. the begining point of prcess reading and executing script files is ```LoadBootScripts()```.
+init.cpp :
+~~~
+...
+    Action::set_function_map(&function_map);
+
+    subcontexts = InitializeSubcontexts();
+
+    ActionManager& am = ActionManager::GetInstance();
+    ServiceList& sm = ServiceList::GetInstance();
+
+    LoadBootScripts(am, sm);
+
+    // Turning this on and letting the INFO logging be discarded adds 0.2s to
+    // Nexus 9 boot time, so it's disabled by default.
+    if (false) DumpState();
+
+    am.QueueEventTrigger("early-init");
+...
+~~~
+The definition of LoadBootScripts() function: 
+~~~
+static void LoadBootScripts(ActionManager& action_manager, ServiceList& service_list) {
+    Parser parser = CreateParser(action_manager, service_list);
+
+    std::string bootscript = GetProperty("ro.boot.init_rc", "");
+    if (bootscript.empty()) {
+        parser.ParseConfig("/init.rc");
+        if (!parser.ParseConfig("/system/etc/init")) {
+            late_import_paths.emplace_back("/system/etc/init");
+        }
+        if (!parser.ParseConfig("/product/etc/init")) {
+            late_import_paths.emplace_back("/product/etc/init");
+        }
+        if (!parser.ParseConfig("/odm/etc/init")) {
+            late_import_paths.emplace_back("/odm/etc/init");
+        }
+        if (!parser.ParseConfig("/vendor/etc/init")) {
+            late_import_paths.emplace_back("/vendor/etc/init");
+        }
+    } else {
+        parser.ParseConfig(bootscript);
+    }
+}
+~~~
+
+
+
