@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Init process in Android (Part 1)
+title: Android Init process (Part 1)
 subtitle: A overview of init process - The commencing point of Android componets
 gh-repo:
 gh-badge: [star, fork, follow]
@@ -171,13 +171,15 @@ The main location of everything belonging to init process is the root directory 
 
 ### 2.3 Process of parsing init scripts
 Look at the code of init process to have a more detail about the locations that init process finds sctipt files. In ```init.cpp```, the begining point of prcess reading and executing script files is ```LoadBootScripts()```.
-- init.cpp :
+
+init.cpp :
 ~~~
 ...
     LoadBootScripts(am, sm);
 ...
 ~~~
-- The definition of LoadBootScripts() function: 
+
+The definition of LoadBootScripts() function: 
 ~~~
 static void LoadBootScripts(ActionManager& action_manager, ServiceList& service_list) {
     Parser parser = CreateParser(action_manager, service_list);
@@ -203,7 +205,8 @@ static void LoadBootScripts(ActionManager& action_manager, ServiceList& service_
 }
 ~~~
 As you can see, It firstly checks whether the ```ro.boot.init_rc``` has a value or not. if ```ro.boot.init_rc``` has a value, it will parse script file with file name is ```ro.boot.init_rc```'s value. if not, the location parsed is default file and directory such as ```/init.rc```, ```/system/etc/init```, ```/product/etc/init```, ```/odm/etc/init```, ```/vendor/etc/init```.
-- Diagram below here show process of parsing script file and folder generally:
+
+Diagram below here show process of parsing script file and folder generally:
 ![Crepe](https://hungemb.github.io/images/1.png)
 - More detail about ParseData() function:
 ![Crepe](https://hungemb.github.io/images/3.png)
@@ -247,14 +250,14 @@ Result<Success> ActionParser::ParseSection(std::vector<std::string>&& args,
 }
 ~~~
 Analysing each segment of code:
-- Check whether the action have a trigger or not, if not, it returns immidiately. Example: action ```on property:init.svc.surfaceflinger=stopped``` haves ```args[0] = "on" args[1] = "property:init.svc.surfaceflinger=stopped"```, this action have a trigger is ```property:init.svc.surfaceflinger=stopped```
+Check whether the action have a trigger or not, if not, it returns immidiately. Example: action ```on property:init.svc.surfaceflinger=stopped``` haves ```args[0] = "on" args[1] = "property:init.svc.surfaceflinger=stopped"```, this action have a trigger is ```property:init.svc.surfaceflinger=stopped```
 ~~~
     std::vector<std::string> triggers(args.begin() + 1, args.end());
     if (triggers.size() < 1) {
         return Error() << "Actions must have a trigger";
     }
 ~~~
-- What is subcontext, its purpose ???
+What is subcontext, its purpose ???
 ~~~
     Subcontext* action_subcontext = nullptr;
     if (subcontexts_) {
@@ -266,7 +269,7 @@ Analysing each segment of code:
         }
     }
 ~~~
-- Parse Trigger of action. From above ```triggers``` vector, init process parses it and create ```event_trigger``` and ```property_triggers``` to save information of action's trigger
+Parse Trigger of action. From above ```triggers``` vector, init process parses it and create ```event_trigger``` and ```property_triggers``` to save information of action's trigger
 ~~~
     std::string event_trigger;
     std::map<std::string, std::string> property_triggers;
@@ -275,7 +278,7 @@ Analysing each segment of code:
         !result) {
         return Error() << "ParseTriggers() failed: " << result.error();
 ~~~
-- Finally, Create a ```Action``` object which save all informations of an action (except commands that will be parsed and added in ```ActionParser:ParseLineAction```)
+Finally, Create a ```Action``` object which save all informations of an action (except commands that will be parsed and added in ```ActionParser:ParseLineAction```)
 ~~~
     auto action = std::make_unique<Action>(false, action_subcontext, filename, line, event_trigger,
                                            property_triggers);
@@ -331,7 +334,7 @@ void ActionManager::ExecuteOneCommand() {
     }
 }
 ~~~
-- Push actions into a queue named ```current_executing_actions_```
+Push actions into a queue named ```current_executing_actions_```
 ~~~
     // Loop through the event queue until we have an action to execute
     while (current_executing_actions_.empty() && !event_queue_.empty()) {
@@ -344,7 +347,7 @@ void ActionManager::ExecuteOneCommand() {
         event_queue_.pop();
     }
 ~~~
-- Pop action and execute commands one by one
+Pop action and execute commands one by one
 ~~~
     auto action = current_executing_actions_.front();
 
@@ -372,7 +375,7 @@ void ActionManager::ExecuteOneCommand() {
 ~~~
 
 ## 4. Import Parser
-- Simple of Import Parse is push name of imported file a vector
+Simple of Import Parse is push name of imported file a vector
 ~~~
 Result<void> ImportParser::ParseSection(std::vector<std::string>&& args,
                                         const std::string& filename, int line) {
@@ -403,7 +406,7 @@ void ImportParser::EndFile() {
 ~~~
 
 ## 5. Service Parser
-- EndSection() function
+EndSection() function
 ~~~
 Result<Success> ServiceParser::EndSection() {
     if (service_) {
@@ -424,8 +427,9 @@ Result<Success> ServiceParser::EndSection() {
     return Success();
 }
 ~~~
+
 ### Invoke Service
-- FindService() is call in ServiceParser::EndSection() and service is invoked by ```std::invoke(function, s)```
+FindService() is call in ServiceParser::EndSection() and service is invoked by ```std::invoke(function, s)```
 ~~~
   template <typename T, typename F = decltype(&Service::name)>
     Service* FindService(T value, F function = &Service::name) const {
