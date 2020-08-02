@@ -249,7 +249,8 @@ Result<Success> ActionParser::ParseSection(std::vector<std::string>&& args,
     return Success();
 }
 ~~~
-Analysing each segment of code:
+Analyse each segment of code:
+
 Check whether the action have a trigger or not, if not, it returns immidiately. Example: action ```on property:init.svc.surfaceflinger=stopped``` haves ```args[0] = "on" args[1] = "property:init.svc.surfaceflinger=stopped"```, this action have a trigger is ```property:init.svc.surfaceflinger=stopped```
 ~~~
     std::vector<std::string> triggers(args.begin() + 1, args.end());
@@ -278,14 +279,14 @@ Parse Trigger of action. From above ```triggers``` vector, init process parses i
         !result) {
         return Error() << "ParseTriggers() failed: " << result.error();
 ~~~
-Finally, Create a ```Action``` object which save all informations of an action (except commands that will be parsed and added in ```ActionParser:ParseLineAction```)
+Finally, Create a ```Action``` object which save all informations of an action and push it to ```action_``` vector
 ~~~
     auto action = std::make_unique<Action>(false, action_subcontext, filename, line, event_trigger,
                                            property_triggers);
 
     action_ = std::move(action);
 ~~~
-Code of ActionParser::ParserLineSection()
+Following to an Action is commands, ```ActionParser::ParserLineSection()``` is method which responsible for parsing commands and its arguments.
 ~~~
 Result<Success> ActionParser::ParseLineSection(std::vector<std::string>&& args, int line) {
     return action_ ? action_->AddCommand(std::move(args), line) : Success();
@@ -293,6 +294,7 @@ Result<Success> ActionParser::ParseLineSection(std::vector<std::string>&& args, 
 ~~~
 
 ### 3.2. Execute action
+Method ```ActionManager::ExecuteOneComman()``` is responsible for executing commands
 ~~~
 void ActionManager::ExecuteOneCommand() {
     // Loop through the event queue until we have an action to execute
@@ -394,7 +396,8 @@ Result<void> ImportParser::ParseSection(std::vector<std::string>&& args,
     return {};
 }
 ~~~
-- At the end of file, ``` ImportParser::EndFile()``` is invoked to parse imported file one by one
+
+At the end of file, ``` ImportParser::EndFile()``` is invoked to parse imported file one by one
 ~~~
 void ImportParser::EndFile() {
     auto current_imports = std::move(imports_);
@@ -406,7 +409,58 @@ void ImportParser::EndFile() {
 ~~~
 
 ## 5. Service Parser
-EndSection() function
+Method ```ServiceParser::ParseSection()``` basically parses content of service statement and create ```unique_ptr<Service> service_``` object saving all information of a service.
+~~~
+Result<void> ServiceParser::ParseSection(std::vector<std::string>&& args,
+                                         const std::string& filename, int line) {
+    if (args.size() < 3) {
+        return Error() << "services must have a name and a program";
+    }
+
+    const std::string& name = args[1];
+    if (!IsValidName(name)) {
+        return Error() << "invalid service name '" << name << "'";
+    }
+
+    filename_ = filename;
+
+    Subcontext* restart_action_subcontext = nullptr;
+    if (subcontext_ && subcontext_->PathMatchesSubcontext(filename)) {
+        restart_action_subcontext = subcontext_;
+    }
+
+    std::vector<std::string> str_args(args.begin() + 2, args.end());
+
+    if (SelinuxGetVendorAndroidVersion() <= __ANDROID_API_P__) {
+        if (str_args[0] == "/sbin/watchdogd") {
+            str_args[0] = "/system/bin/watchdogd";
+        }
+    }
+    if (SelinuxGetVendorAndroidVersion() <= __ANDROID_API_Q__) {
+        if (str_args[0] == "/charger") {
+            str_args[0] = "/system/bin/charger";
+        }
+    }
+
+    service_ = std::make_unique<Service>(name, restart_action_subcontext, str_args, from_apex_);
+    return {};
+}
+~~~
+Method ```ServiceParser::ParseLineSection()``` directly executes commands binded to service.
+~~~
+Result<void> ServiceParser::ParseLineSection(std::vector<std::string>&& args, int line) {
+    if (!service_) {
+        return {};
+    }
+
+    auto parser = GetParserMap().Find(args);
+
+    if (!parser.ok()) return parser.error();
+
+    return std::invoke(*parser, this, std::move(args));
+}
+~~~
+Method ```ServiceParser::EndSection()``` implements service
 ~~~
 Result<Success> ServiceParser::EndSection() {
     if (service_) {
@@ -427,9 +481,7 @@ Result<Success> ServiceParser::EndSection() {
     return Success();
 }
 ~~~
-
-### Invoke Service
-FindService() is call in ServiceParser::EndSection() and service is invoked by ```std::invoke(function, s)```
+FindService() is called in ServiceParser::EndSection() and service is invoked by ```std::invoke(function, s)```
 ~~~
   template <typename T, typename F = decltype(&Service::name)>
     Service* FindService(T value, F function = &Service::name) const {
