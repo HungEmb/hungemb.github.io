@@ -9,6 +9,7 @@ comments: true
 ---
 Once the kernel has finished initializing device drivers and its own internal structures, the init process invoked by kernel is the first process in the user space of the Android system. As the first process, it has been given many extremely important job responsibilities, such as creating zygote (app incubator) and attribute services..
 Today, I will illustrate how init intergrates with the rest of Android components. It essentially reads configuration files, prints out a booting logo or text to the screen, open a socket for its property service, and starts all the deamons and service that bring up the entire Android user-space.
+
 ## 1. Init entry function
 The entry function of init is main(), and the code is shown below. system/core/init/init.cpp
 ~~~
@@ -101,6 +102,7 @@ The file that parses ```init.rc``` is the ```system/core/init/parse.cpp``` file.
 
 ## 2. Init script files
 Major behavior of init process is through its script files. Let's go, I will show you about location, sematics, process of parsing and executing init script files.
+
 ### 2.1. Android Init Language
 init.rc is a configuration file, an internal script written by Android Init Language, 
 which mainly contains five types of statements: Action, Commands, Services, Options, and Import. 
@@ -163,8 +165,10 @@ service <name> <pathname> [ <argument> ]*
    ...
 ~~~
 For more detail about [Android Init Language](https://android.googlesource.com/platform/system/core/+/master/init/README.md)
+
 ### 2.2 Location
 The main location of everything belonging to init process is the root directory (/). Here you can find actual init binary itself and scipt files that control the main behavior of init process, such as: init.rc, init.environ.rc, init.zygote32.rc,... . In addition, There is a few other locations comprising script files such as ```/system/etc/init```, ```/product/etc/init```, ```/odm/etc/init```, ```/vendor/etc/init```. These directory comprises script file that initializing HIDL service at HAL Layer.
+
 ### 2.3 Process of parsing init scripts
 Look at the code of init process to have a more detail about the locations that init process finds sctipt files. In ```init.cpp```, the begining point of prcess reading and executing script files is ```LoadBootScripts()```.
 - init.cpp :
@@ -285,9 +289,6 @@ Result<Success> ActionParser::ParseLineSection(std::vector<std::string>&& args, 
 }
 ~~~
 
-
-
-
 ### 3.2. Execute action
 ~~~
 void ActionManager::ExecuteOneCommand() {
@@ -369,6 +370,7 @@ void ActionManager::ExecuteOneCommand() {
     }
 }
 ~~~
+
 ## 4. Import Parser
 - Simple of Import Parse is push name of imported file a vector
 ~~~
