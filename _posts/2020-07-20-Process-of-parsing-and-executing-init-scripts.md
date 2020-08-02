@@ -157,7 +157,7 @@ on <trigger> [&& <trigger>]*
    <command>
    <command>
 ~~~
-And Services type statements:
+And ```service ueventd /sbin/ueventd``` is Services type statement:
 ~~~
 service <name> <pathname> [ <argument> ]*
    <option>
@@ -208,7 +208,7 @@ As you can see, It firstly checks whether the ```ro.boot.init_rc``` has a value 
 
 Diagram below here show process of parsing script file and folder generally:
 ![Crepe](https://hungemb.github.io/images/1.png)
-- More detail about ParseData() function:
+More detail about ParseData() function:
 ![Crepe](https://hungemb.github.io/images/3.png)
 
 ## 3. Action Parser
