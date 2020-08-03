@@ -208,6 +208,7 @@ As you can see, It firstly checks whether the ```ro.boot.init_rc``` has a value 
 
 Diagram below here show process of parsing script file and folder generally:
 ![Crepe](https://hungemb.github.io/images/1.png)
+
 More detail about ParseData() function:
 ![Crepe](https://hungemb.github.io/images/3.png)
 
