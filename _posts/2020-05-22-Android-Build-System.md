@@ -10,4 +10,6 @@ comments: true
 Before getting your dirty hands into developing Android system, The part of knowledge you have to perceive firtly is build system. I will have an overview of build system itself, tool involved, and the unique approach to the whole process Google has.
 ## An Overview
 
+To be continue ...
+
 
