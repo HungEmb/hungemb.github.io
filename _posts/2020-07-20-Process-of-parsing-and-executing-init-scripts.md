@@ -150,6 +150,7 @@ service flash_recovery /system/bin/install-recovery.sh
     class main
     oneshot
 ~~~
+
 where # is the comment symbol. ```on init``` and ```on property:sys.boot_from_charger_mode=1```,.. are Action type statements, and its format is:
 ~~~
 on <trigger> [&& <trigger>]*
@@ -157,6 +158,7 @@ on <trigger> [&& <trigger>]*
    <command>
    <command>
 ~~~
+
 And ```service ueventd /sbin/ueventd``` is Services type statement:
 ~~~
 service <name> <pathname> [ <argument> ]*
@@ -250,8 +252,8 @@ Result<Success> ActionParser::ParseSection(std::vector<std::string>&& args,
     return Success();
 }
 ~~~
-Analyse each segment of code:
 
+Analyse each segment of code:
 Check whether the action have a trigger or not, if not, it returns immidiately. Example: action ```on property:init.svc.surfaceflinger=stopped``` haves ```args[0] = "on" args[1] = "property:init.svc.surfaceflinger=stopped"```, this action have a trigger is ```property:init.svc.surfaceflinger=stopped```
 ~~~
     std::vector<std::string> triggers(args.begin() + 1, args.end());
@@ -259,6 +261,7 @@ Check whether the action have a trigger or not, if not, it returns immidiately. 
         return Error() << "Actions must have a trigger";
     }
 ~~~
+
 What is subcontext, its purpose ???
 ~~~
     Subcontext* action_subcontext = nullptr;
@@ -271,6 +274,7 @@ What is subcontext, its purpose ???
         }
     }
 ~~~
+
 Parse Trigger of action. From above ```triggers``` vector, init process parses it and create ```event_trigger``` and ```property_triggers``` to save information of action's trigger
 ~~~
     std::string event_trigger;
@@ -280,6 +284,7 @@ Parse Trigger of action. From above ```triggers``` vector, init process parses i
         !result) {
         return Error() << "ParseTriggers() failed: " << result.error();
 ~~~
+
 Finally, Create a ```Action``` object which save all informations of an action and push it to ```action_``` vector
 ~~~
     auto action = std::make_unique<Action>(false, action_subcontext, filename, line, event_trigger,
@@ -287,6 +292,7 @@ Finally, Create a ```Action``` object which save all informations of an action a
 
     action_ = std::move(action);
 ~~~
+
 Following to an Action is commands, ```ActionParser::ParserLineSection()``` is method which responsible for parsing commands and its arguments.
 ~~~
 Result<Success> ActionParser::ParseLineSection(std::vector<std::string>&& args, int line) {
@@ -337,6 +343,7 @@ void ActionManager::ExecuteOneCommand() {
     }
 }
 ~~~
+
 Push actions into a queue named ```current_executing_actions_```
 ~~~
     // Loop through the event queue until we have an action to execute
@@ -350,6 +357,7 @@ Push actions into a queue named ```current_executing_actions_```
         event_queue_.pop();
     }
 ~~~
+
 Pop action and execute commands one by one
 ~~~
     auto action = current_executing_actions_.front();
@@ -447,6 +455,7 @@ Result<void> ServiceParser::ParseSection(std::vector<std::string>&& args,
     return {};
 }
 ~~~
+
 Method ```ServiceParser::ParseLineSection()``` directly executes commands binded to service.
 ~~~
 Result<void> ServiceParser::ParseLineSection(std::vector<std::string>&& args, int line) {
@@ -461,6 +470,7 @@ Result<void> ServiceParser::ParseLineSection(std::vector<std::string>&& args, in
     return std::invoke(*parser, this, std::move(args));
 }
 ~~~
+
 Method ```ServiceParser::EndSection()``` implements service
 ~~~
 Result<Success> ServiceParser::EndSection() {
@@ -482,6 +492,7 @@ Result<Success> ServiceParser::EndSection() {
     return Success();
 }
 ~~~
+
 FindService() is called in ServiceParser::EndSection() and service is invoked by ```std::invoke(function, s)```
 ~~~
   template <typename T, typename F = decltype(&Service::name)>
@@ -497,6 +508,8 @@ FindService() is called in ServiceParser::EndSection() and service is invoked by
         return nullptr;
   }
 ~~~
+
+To be continue ...
 
 
 
