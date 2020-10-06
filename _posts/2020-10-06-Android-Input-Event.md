@@ -21,5 +21,5 @@ InputHarware -----> Linux Kernel/Driver -----> EvenHub -----> InputReader ----->
 Let's start
 ## 2. InputManagerService
 During booting process, systemserver starts InputManagerService and this is the starting point of my analysis.
-![Crepe](https://hungemb.github.io/images/2e1fd18cba83cbebb180d31c2d0354c9.jpg)
-
+![Crepe](https://hungemb.github.io/images/InputEvent1.png)
+![Crepe](https://hungemb.github.io/images/InputEvent2.png)
