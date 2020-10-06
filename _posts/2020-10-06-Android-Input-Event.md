@@ -30,4 +30,5 @@ During booting process, systemserver starts InputManagerService and this is the 
 - frameworks/base/services/core/jni/com_android_server_input_InputManagerService.cpp
 ![Crepe](https://hungemb.github.io/images/InputEvent3.png)
 
+- Finally, ```EventHub``` and ```InputManager``` are initialized.
 ![Crepe](https://hungemb.github.io/images/InputEvent4.png)
