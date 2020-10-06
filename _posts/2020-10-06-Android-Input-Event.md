@@ -21,5 +21,13 @@ InputHarware -----> Linux Kernel/Driver -----> EvenHub -----> InputReader ----->
 Let's start
 ## 2. InputManagerService
 During booting process, systemserver starts InputManagerService and this is the starting point of my analysis.
+- frameworks/base/services/java/com/android/server/SystemServer.java
 ![Crepe](https://hungemb.github.io/images/InputEvent1.png)
+
+- frameworks/base/services/core/java/com/android/server/input/InputManagerService.java
 ![Crepe](https://hungemb.github.io/images/InputEvent2.png)
+
+- frameworks/base/services/core/jni/com_android_server_input_InputManagerService.cpp
+![Crepe](https://hungemb.github.io/images/InputEvent3.png)
+
+![Crepe](https://hungemb.github.io/images/InputEvent4.png)
